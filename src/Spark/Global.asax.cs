@@ -20,7 +20,7 @@ namespace Spark
     {
         protected void Application_Start()
         {
-            ConfigureLogging();            
+            Logging.Logging.SetUp();
             GlobalConfiguration.Configure(this.Configure);
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
@@ -35,29 +35,10 @@ namespace Spark
             config.AddFhir(Settings.PermissiveParsing);
         }
 
-        private ObservableEventListener eventListener;
-        private void ConfigureLogging()
-        {
-            eventListener = new ObservableEventListener();
-            eventListener.EnableEvents(SparkEngineEventSource.Log, EventLevel.LogAlways,
-                Keywords.All);
-            eventListener.EnableEvents(SparkMongoEventSource.Log, EventLevel.LogAlways,
-                Keywords.All);
-            eventListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways, Keywords.All);
-            var formatter = new JsonEventTextFormatter(EventTextFormatting.Indented);
-            eventListener.LogToFlatFile(@".\spark.log", formatter);
-        }
-
 
         protected void Application_End()
         {
-            if (eventListener != null)
-            {
-                eventListener.DisableEvents(SemanticLoggingEventSource.Log);
-                eventListener.DisableEvents(SparkMongoEventSource.Log);
-                eventListener.DisableEvents(SparkEngineEventSource.Log);
-                eventListener.Dispose();
-            }
+            Logging.Logging.TearDown();
         }
     }
 

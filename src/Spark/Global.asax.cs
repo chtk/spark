@@ -20,7 +20,6 @@ namespace Spark
     {
         protected void Application_Start()
         {
-            Logging.Logging.SetUp();
             GlobalConfiguration.Configure(this.Configure);
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
@@ -36,10 +35,5 @@ namespace Spark
         }
 
 
-        protected void Application_End()
-        {
-            Logging.Logging.TearDown();
-        }
     }
-
 }

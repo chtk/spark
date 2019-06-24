@@ -249,9 +249,6 @@
     <Compile Include="Controllers\FhirController.cs" />
     <Compile Include="Controllers\MaintenanceApiController.cs" />
     <Compile Include="Controllers\MaintenanceController.cs" />
-    <Compile Include="Global.asax.cs">
-      <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
     <Compile Include="Hubs\Examples.cs" />
     <Compile Include="Hubs\FhirLoader.cs" />
     <Compile Include="Hubs\InitializerHub.cs" />
@@ -284,7 +281,6 @@
     <Content Include="Content\Fire.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="Global.asax" />
     <Content Include="Content\css\site.scss">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

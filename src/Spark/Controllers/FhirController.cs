@@ -17,6 +17,7 @@ using Spark.Infrastructure;
 
 namespace Spark.Controllers
 {
+    [Authorize]
     [RoutePrefix("fhir"), EnableCors("*", "*", "*", "*")]
     [RouteDataValuesOnly]
     public class FhirController : ApiController

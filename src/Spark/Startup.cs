@@ -1,5 +1,8 @@
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin;
 using Microsoft.Owin.BuilderProperties;
+using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Jwt;
 using Owin;
 using Spark.Engine.Extensions;
 using System.Threading;
@@ -34,10 +37,26 @@ namespace Spark
             }
             app.MapSignalR();
             GlobalConfiguration.Configure(this.Configure);
+            ConfigureJwtAuthentication(app);
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+        }
+        private void ConfigureJwtAuthentication(IAppBuilder app)
+        {
+            app.UseJwtBearerAuthentication(
+                new JwtBearerAuthenticationOptions
+                {
+                    AuthenticationMode = AuthenticationMode.Active,
+                    TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = false,
+                        ValidIssuers = Settings.JwtKeyIssuers,
+                        IssuerSigningKeys = Settings.JwtKeys,
+                    },
+                    IssuerSecurityKeyProviders = Settings.JwtKeyProviders
+                });
         }
     }
 }

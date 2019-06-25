@@ -1,13 +1,36 @@
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Owin.Security.Jwt;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
+using System.Web;
 
 namespace Spark
 {
+    public class JwtCert
+    {
+        public string Type { get; set; }
+        public string Issuer { get; set; }
+        public int? TokenTtl { get; set; }
+        public IIssuerSecurityKeyProvider Provider { get; set; }
+    }
+
     public static class Settings
     {
+        private static Dictionary<string, JwtCert> jwtCertDict = new Dictionary<string, JwtCert>();
+
+        static Settings()
+        {
+            ReadJwtCertConfig();
+        }
+
         public static string Version
         {
             get
@@ -68,6 +91,45 @@ namespace Spark
         public static string AwsBucketName
         {
             get { return GetRequiredKey("AWSBucketName"); }
+        }
+
+        public static string CertPath {
+            get { return GetRequiredKey("JwtCertsConfig"); }
+        }
+
+        public static SecurityKey[] JwtKeys {
+            get {
+                ReadJwtCertConfig();
+                return jwtCertDict
+                    .Select(e => e.Value.Provider)
+                    .SelectMany(e => e.SecurityKeys)
+                    .ToArray();
+            }
+        }
+
+        public static string[] JwtKeyIssuers {
+            get {
+                ReadJwtCertConfig();
+                return jwtCertDict
+                    .Select(e => e.Value.Issuer)
+                    .ToArray();
+            }
+        }
+
+        public static IIssuerSecurityKeyProvider[] JwtKeyProviders {
+            get
+            {
+                ReadJwtCertConfig();
+                return jwtCertDict
+                    .Select(e => e.Value.Provider)
+                    .ToArray();
+            }
+        }
+
+        public static IDictionary<string, JwtCert> JwtCerts {
+            get {
+                return jwtCertDict;
+            }
         }
 
         public static Uri Endpoint
@@ -132,6 +194,48 @@ namespace Spark
                 throw new ArgumentException(string.Format("The configuration variable {0} is missing.", key));
 
             return s;
+        }
+        private static void ReadJwtCertConfig()
+        {
+            jwtCertDict.Clear();
+            if (File.Exists(Settings.CertPath))
+            {
+                var stringReader = new StreamReader(Settings.CertPath);
+                JObject config = JObject.Parse(stringReader.ReadToEnd());
+                var basePath = (string)config.SelectToken(".path");
+                var certConfigs = config.SelectToken(".certs");
+                foreach (var certConfig in certConfigs)
+                {
+                    switch ((string)certConfig.SelectToken(".type"))
+                    {
+                        case "":
+                        case "rsa":
+                            var certName = (string)certConfig.SelectToken(".certName");
+                            if (!Path.IsPathRooted(certName))
+                                certName = Path.Combine(basePath, certName);
+                            jwtCertDict.Add(
+                                (string)certConfig.SelectToken(".issuer"),
+                                new JwtCert()
+                                {
+                                    Issuer = (string)certConfig.SelectToken(".issuer"),
+                                    Provider = new X509CertificateSecurityKeyProvider(
+                                        (string)certConfig.SelectToken(".issuer"),
+                                        new X509Certificate2(
+                                            certName,
+                                            "",
+                                            X509KeyStorageFlags.DefaultKeySet
+                                        )
+                                    ),
+                                    TokenTtl = (int?)certConfig.SelectToken(".tokenTtl", false),
+                                    Type = (string)certConfig.SelectToken(".type")
+                                }
+                            );
+                            break;
+                        default:
+                            throw new Exception(string.Format("Unsupported type: {0}", certConfig.SelectToken(".type")));
+                    }
+                }
+            }
         }
     }
 }

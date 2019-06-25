@@ -48,6 +48,7 @@ namespace Spark
             app.UseJwtBearerAuthentication(
                 new JwtBearerAuthenticationOptions
                 {
+                    TokenHandler = new SparkJwtSecurityTokenHandler(),
                     AuthenticationMode = AuthenticationMode.Active,
                     TokenValidationParameters = new TokenValidationParameters
                     {

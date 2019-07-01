@@ -40,5 +40,11 @@ namespace Spark.Authentication
             this.WriteEvent(2, path);
         }
 
+        [Event(3, Message = "JWT key added", Level = EventLevel.Verbose, Keywords = Keywords.Tracing)]
+        internal void JwtKeyAdded (string type, string issuer, string name)
+        {
+            this.WriteEvent(3, type, issuer, name);
+        }
+
     }
 }

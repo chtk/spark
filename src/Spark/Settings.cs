@@ -238,6 +238,7 @@ namespace Spark
                         default:
                             throw new Exception(string.Format("Unsupported type: {0}", type));
                     }
+                    log.JwtKeyAdded(type, issuer, certName);
                 }
             }
             else

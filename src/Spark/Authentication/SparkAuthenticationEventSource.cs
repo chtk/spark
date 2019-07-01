@@ -46,5 +46,10 @@ namespace Spark.Authentication
             this.WriteEvent(3, type, issuer, name);
         }
 
+        [Event(4, Message = "Failed to load JWT key: {0}", Level = EventLevel.Error, Keywords = Keywords.Invalid)]
+        internal void JwtKeyLoadFailed (string message, string type, string issuer, string name)
+        {
+            this.WriteEvent(4, message, type, issuer, name);
+        }
     }
 }

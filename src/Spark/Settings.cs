@@ -211,32 +211,40 @@ namespace Spark
                     var type = (string)certConfig.SelectToken(".type");
                     var issuer = (string)certConfig.SelectToken(".issuer");
                     var certName = (string)certConfig.SelectToken(".certName");
-                    switch (type)
+                    try
                     {
-                        case "":
-                        case "rsa":
-                            if (!Path.IsPathRooted(certName))
-                                certName = Path.Combine(basePath, certName);
-                            jwtCertDict.Add(
-                                issuer,
-                                new JwtCert()
-                                {
-                                    Issuer = issuer,
-                                    Provider = new X509CertificateSecurityKeyProvider(
-                                        issuer,
-                                        new X509Certificate2(
-                                            certName,
-                                            "",
-                                            X509KeyStorageFlags.DefaultKeySet
-                                        )
-                                    ),
-                                    TokenTtl = (int?)certConfig.SelectToken(".tokenTtl", false),
-                                    Type = type
-                                }
-                            );
-                            break;
-                        default:
-                            throw new Exception(string.Format("Unsupported type: {0}", type));
+                        switch (type)
+                        {
+                            case "":
+                            case "rsa":
+                                if (!Path.IsPathRooted(certName))
+                                    certName = Path.Combine(basePath, certName);
+                                jwtCertDict.Add(
+                                    issuer,
+                                    new JwtCert()
+                                    {
+                                        Issuer = issuer,
+                                        Provider = new X509CertificateSecurityKeyProvider(
+                                            issuer,
+                                            new X509Certificate2(
+                                                certName,
+                                                "",
+                                                X509KeyStorageFlags.DefaultKeySet
+                                            )
+                                        ),
+                                        TokenTtl = (int?)certConfig.SelectToken(".tokenTtl", false),
+                                        Type = type
+                                    }
+                                );
+                                break;
+                            default:
+                                throw new Exception(string.Format("Unsupported type: {0}", type));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        log.JwtKeyLoadFailed(e.Message, type, issuer, certName);
+                        throw e;
                     }
                     log.JwtKeyAdded(type, issuer, certName);
                 }

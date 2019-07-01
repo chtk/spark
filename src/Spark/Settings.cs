@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
+using Spark.Authentication;
 
 namespace Spark
 {
@@ -197,6 +198,7 @@ namespace Spark
         }
         private static void ReadJwtCertConfig()
         {
+            var log = SparkAuthenticationEventSource.Log;
             jwtCertDict.Clear();
             if (File.Exists(Settings.CertPath))
             {
@@ -236,6 +238,8 @@ namespace Spark
                     }
                 }
             }
+            else
+                log.NoSuchFile(Settings.CertPath);
         }
     }
 }

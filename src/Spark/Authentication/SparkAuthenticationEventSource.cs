@@ -33,5 +33,12 @@ namespace Spark.Authentication
         {
             this.WriteEvent(1, message, token);
         }
+
+        [Event(2, Message = "Nu such file: {0}", Level = EventLevel.Warning, Keywords = Keywords.Invalid)]
+        internal void NoSuchFile (string path)
+        {
+            this.WriteEvent(2, path);
+        }
+
     }
 }

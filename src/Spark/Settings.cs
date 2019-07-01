@@ -208,20 +208,22 @@ namespace Spark
                 var certConfigs = config.SelectToken(".certs");
                 foreach (var certConfig in certConfigs)
                 {
-                    switch ((string)certConfig.SelectToken(".type"))
+                    var type = (string)certConfig.SelectToken(".type");
+                    var issuer = (string)certConfig.SelectToken(".issuer");
+                    var certName = (string)certConfig.SelectToken(".certName");
+                    switch (type)
                     {
                         case "":
                         case "rsa":
-                            var certName = (string)certConfig.SelectToken(".certName");
                             if (!Path.IsPathRooted(certName))
                                 certName = Path.Combine(basePath, certName);
                             jwtCertDict.Add(
-                                (string)certConfig.SelectToken(".issuer"),
+                                issuer,
                                 new JwtCert()
                                 {
-                                    Issuer = (string)certConfig.SelectToken(".issuer"),
+                                    Issuer = issuer,
                                     Provider = new X509CertificateSecurityKeyProvider(
-                                        (string)certConfig.SelectToken(".issuer"),
+                                        issuer,
                                         new X509Certificate2(
                                             certName,
                                             "",
@@ -229,12 +231,12 @@ namespace Spark
                                         )
                                     ),
                                     TokenTtl = (int?)certConfig.SelectToken(".tokenTtl", false),
-                                    Type = (string)certConfig.SelectToken(".type")
+                                    Type = type
                                 }
                             );
                             break;
                         default:
-                            throw new Exception(string.Format("Unsupported type: {0}", certConfig.SelectToken(".type")));
+                            throw new Exception(string.Format("Unsupported type: {0}", type));
                     }
                 }
             }

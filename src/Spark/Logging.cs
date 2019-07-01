@@ -1,5 +1,6 @@
 ﻿using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
+using Spark.Authentication;
 using Spark.Engine.Logging;
 using Spark.Mongo;
 using System.Diagnostics.Tracing;
@@ -22,6 +23,7 @@ namespace Spark
             eventListener.EnableEvents(SparkMongoEventSource.Log, EventLevel.LogAlways,
                 Keywords.All);
             eventListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways, Keywords.All);
+            eventListener.EnableEvents(SparkAuthenticationEventSource.Log, EventLevel.LogAlways, Keywords.All);
             var formatter = new JsonEventTextFormatter(EventTextFormatting.Indented);
             eventListener.LogToFlatFile(@".\spark.log", formatter);
         }

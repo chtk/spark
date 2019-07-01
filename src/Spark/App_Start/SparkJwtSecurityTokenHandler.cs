@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using Spark.Authentication;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -21,6 +22,18 @@ namespace Spark
                         : 5);
             }
             base.ValidateLifetime(notBefore, expires, jwtToken, validationParameters);
+        }
+        public override ClaimsPrincipal ValidateToken(string token, TokenValidationParameters validationParameters, out SecurityToken validatedToken)
+        {
+            try
+            {
+                return base.ValidateToken(token, validationParameters, out validatedToken);
+            }
+            catch (Exception e)
+            {
+                SparkAuthenticationEventSource.Log.TokenValidationFailure(e.Message, token);
+                throw e;
+            }
         }
     }
 }

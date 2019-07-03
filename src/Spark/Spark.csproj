@@ -271,6 +271,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Authentication\SparkAuthenticationEventSource.cs" />
+    <Compile Include="Authentication\SparkJwtAuthorizationAttribute.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\FhirController.cs" />
     <Compile Include="Controllers\MaintenanceApiController.cs" />

@@ -14,10 +14,11 @@ using System.Web.Http.Cors;
 using Hl7.Fhir.Rest;
 using Spark.Core;
 using Spark.Infrastructure;
+using Spark.Authentication;
 
 namespace Spark.Controllers
 {
-    [Authorize]
+    [SparkJwtAuthorization]
     [RoutePrefix("fhir"), EnableCors("*", "*", "*", "*")]
     [RouteDataValuesOnly]
     public class FhirController : ApiController

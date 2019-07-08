@@ -22,6 +22,7 @@ namespace Spark
                     ValidateAudience = false,
                     ValidIssuers = Settings.JwtKeyIssuers,
                     IssuerSigningKeys = Settings.JwtKeys,
+                    ClockSkew = TimeSpan.Zero,
                 },
                 IssuerSecurityKeyProviders = Settings.JwtKeyProviders
             };
